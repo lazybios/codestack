@@ -98,6 +98,10 @@ class IndexHandler(tornado.web.RequestHandler):
                 ,self.get_argument('echostr',None)
                 )))
 
+    def post(self):
+        bodyString = self.request.body
+        print bodyString
+
 
 def main():
     tornado.options.parse_command_line()
