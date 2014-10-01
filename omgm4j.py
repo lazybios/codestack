@@ -6,12 +6,14 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import time
+import logging
 import hashlib
 
 from tornado.options import define,options
 from xml.etree import ElementTree as ET
 
-WELCOME_REPLY = ''' 感谢您关注 OMG面试君 快快与我们一起备战即将来临的IT面试吧\n1.面试经验贴\n2.面试真题模拟'''
+WELCOME_REPLY = ''' 感谢您关注 OMG面试君(omgm4j) 快快一起加入面霸团\n\n1.面经分享\n2.实战真题\n\n妈妈再也不用担心我的工作了!!! '''
+
 
 TEXT_REPLY = '''<xml>
 <ToUserName><![CDATA[{toUser}]]></ToUserName>
@@ -94,7 +96,12 @@ class Application(tornado.web.Application):
                 user=options.mysql_user,password=options.mysql_password,
                 )
 
-class IndexHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler):
+    @property
+    def db(self):
+        return self.application.db
+
+class IndexHandler(BaseHandler):
     def get(self):
         wxhelper = WeixinHelper()
         self.write(str(wxhelper.chkauthor(
@@ -109,7 +116,21 @@ class IndexHandler(tornado.web.RequestHandler):
         print bodyString
         wxMsg = WeixinMessage(bodyString)
         if wxMsg.MsgType == 'event':
-            pass
+            sql = '''INSERT INTO `omgm4j`.`m4j_user` (`usr_openid`,`usr_create_time`, `status`) VALUES ('{openID}', CURRENT_TIMESTAMP, '0');'''.format(openID = wxMsg.FromUserName)
+
+            print sql
+            try:
+                self.db.insert(sql)
+            except IntegrityError:
+                pass
+
+            reply = TEXT_REPLY.format(
+                    toUser = wxMsg.FromUserName,
+                    fromUser = wxMsg.ToUserName,
+                    createTime = str(int(time.time())),
+                    content = WELCOME_REPLY
+                    )
+
         elif wxMsg.MsgType == 'text':
             reply = TEXT_REPLY.format(
                     toUser = wxMsg.FromUserName,
