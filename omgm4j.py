@@ -14,12 +14,11 @@ from xml.etree import ElementTree as ET
 WELCOME_REPLY = ''' 感谢您关注 OMG面试君 快快与我们一起备战即将来临的IT面试吧\n1.面试经验贴\n2.面试真题模拟'''
 
 TEXT_REPLY = '''<xml>
-<tousername><![cdata[{toUser}]]></ToUserName>
-<fromusername><![cdata[{fromUser}]]></FromUserName> 
-<createtime>{createTime}</createtime>
-<msgtype><![cdata[{msgType}]]></msgtype>
-<content><![cdata[{content}]]></Content>
-<msgid>{msgId}</msgid>
+<ToUserName><![CDATA[{toUser}]]></ToUserName>
+<FromUserName><![CDATA[{fromUser}]]></FromUserName>
+<CreateTime>{createTime}</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[{content}]]></Content>
 </xml>'''
 
 define("port",default=8888,help="run on the given port",type=int)
@@ -70,7 +69,7 @@ class WeixinMessage:
         elif self.MsgType == 'image':
             pass
         elif self.MsgType == 'text':
-            self.Content = root.find('Content').text
+            self.Content = u''.join(root.find('Content').text).encode('utf-8').strip()
             self.MsgId = root.find('MsgId').text
         elif self.MsgType == 'image':
             pass
@@ -113,13 +112,13 @@ class IndexHandler(tornado.web.RequestHandler):
             pass
         elif wxMsg.MsgType == 'text':
             reply = TEXT_REPLY.format(
-                    toUser = wxMsg.fromUser,
-                    fromUser = wxMsg.toUser,
-                    create = str(int(time.time())),
-                    msgType = 'text',
+                    toUser = wxMsg.FromUserName,
+                    fromUser = wxMsg.ToUserName,
+                    createTime = str(int(time.time())),
                     content = wxMsg.Content
                     )
 
+        print reply
         self.set_status(200)
         self.write(reply)
         self.finish()
