@@ -9,20 +9,31 @@ import time
 import hashlib
 
 from tornado.options import define,options
+from xml.etree import ElementTree as ET
 
 WELCOME_REPLY = ''' 感谢您关注 OMG面试君 快快与我们一起备战即将来临的IT面试吧\n1.面试经验贴\n2.面试真题模拟'''
+
+TEXT_REPLY = '''<xml>
+<tousername><![cdata[{toUser}]]></ToUserName>
+<fromusername><![cdata[{fromUser}]]></FromUserName> 
+<createtime>{createTime}</createtime>
+<msgtype><![cdata[{msgType}]]></msgtype>
+<content><![cdata[{content}]]></Content>
+<msgid>{msgId}</msgid>
+</xml>'''
+
+define("port",default=8888,help="run on the given port",type=int)
+define("mysql_host",default="localhost",help="omgm4j database host")
+define("mysql_database",default="omgm4j",help="omgm4j database name")
+define("mysql_user",default="root",help="omgm4j database user")
+define("mysql_password",default="root",help="omgm4j database password")
 
 class WeixinHelper:
     def __init__(self):
         pass
 
     def chkauthor(self,signature,timestamp,nonce,echostr):
-        #signature  = self.get_argument("signature",None)
-        #timestamp = self.get_argument("timestamp",None)
-        #nonce = self.get_argument("nonce",None)
-        #echostr = self.get_argument("echostr",None)
         token = 'omgm4j'
-
         if signature and timestamp and nonce:
             params = [token,timestamp,nonce]
             params.sort()
@@ -59,7 +70,8 @@ class WeixinMessage:
         elif self.MsgType == 'image':
             pass
         elif self.MsgType == 'text':
-            pass
+            self.Content = root.find('Content').text
+            self.MsgId = root.find('MsgId').text
         elif self.MsgType == 'image':
             pass
         elif self.MsgType == 'link':
@@ -67,11 +79,6 @@ class WeixinMessage:
         elif self.MsgType == 'location':
             pass
 
-define("port",default=8888,help="run on the given port",type=int)
-define("mysql_host",default="localhost",help="omgm4j database host")
-define("mysql_database",default="test",help="omgm4j database name")
-define("mysql_user",default="root",help="omgm4j database user")
-define("mysql_password",default="root",help="omgm4j database password")
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -101,7 +108,21 @@ class IndexHandler(tornado.web.RequestHandler):
     def post(self):
         bodyString = self.request.body
         print bodyString
+        wxMsg = WeixinMessage(bodyString)
+        if wxMsg.MsgType == 'event':
+            pass
+        elif wxMsg.MsgType == 'text':
+            reply = TEXT_REPLY.format(
+                    toUser = wxMsg.fromUser,
+                    fromUser = wxMsg.toUser,
+                    create = str(int(time.time())),
+                    msgType = 'text',
+                    content = wxMsg.Content
+                    )
 
+        self.set_status(200)
+        self.write(reply)
+        self.finish()
 
 def main():
     tornado.options.parse_command_line()
