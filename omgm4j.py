@@ -8,6 +8,7 @@ import tornado.web
 import time
 import logging
 import hashlib
+import redis
 
 from tornado.options import define,options
 from xml.etree import ElementTree as ET
@@ -117,12 +118,19 @@ class IndexHandler(BaseHandler):
         wxMsg = WeixinMessage(bodyString)
         if wxMsg.MsgType == 'event':
             if wxMsg.Event == 'unsubscribe':
-                sql = '''UPDATE  `omgm4j`.`m4j_user` SET  `status` =  '-1' WHERE  `m4j_user`.`usr_openid` ='{openid}';'''.format(openid=wxMsg.FromUserName)
+                #sql = '''UPDATE  `omgm4j`.`m4j_user` SET  `status` =  '-1' WHERE  `m4j_user`.`usr_openid` ='{openid}';'''.format(openid=wxMsg.FromUserName)
+                #set user status to -1 disactivate
+                sql = ("UPDATE  `omgm4j`.`m4j_user` SET  `status` =  '-1'"
+                       " WHERE  `m4j_user`.`usr_openid` ='{openid}';").format(openid=wxMsg.FromUserName)
                 print sql
                 self.db.update(sql)
                 reply = ''
             else:
-                sql = '''INSERT INTO `omgm4j`.`m4j_user` (`usr_openid`,`usr_create_time`,`last_use_time`,`status`,`invite`) VALUES ('{openID}', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, '0',0);'''.format(openID = wxMsg.FromUserName)
+                #sql = '''INSERT INTO `omgm4j`.`m4j_user` (`usr_openid`,`usr_create_time`,`last_use_time`,`status`,`invite`) VALUES ('{openID}', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, '0',0);'''.format(openID = wxMsg.FromUserName)
+                #save the new user to crm database initialize all fields
+                sql = ("INSERT INTO `omgm4j`.`m4j_user` (`usr_openid`,`usr_create_time`,"
+                        "`last_use_time`,`status`,`invite`) VALUES ('{openID}',"
+                        "CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, '0',0);").format(openID = wxMsg.FromUserName)
                 print sql
                 try:
                     self.db.insert(sql)
