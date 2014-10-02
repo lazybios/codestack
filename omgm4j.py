@@ -12,7 +12,7 @@ import hashlib
 from tornado.options import define,options
 from xml.etree import ElementTree as ET
 
-WELCOME_REPLY = ''' 感谢您关注 OMG面试君(omgm4j) 快快一起加入面霸团\n\n1.面经分享\n2.实战真题\n\n妈妈再也不用担心我的工作了!!! '''
+WELCOME_REPLY = '''感谢您关注 OMG面试君 \n\n1.面经分享\n2.实战真题 /:kn\n\n回复“?”显示此帮助菜单'''
 
 
 TEXT_REPLY = '''<xml>
@@ -116,21 +116,25 @@ class IndexHandler(BaseHandler):
         print bodyString
         wxMsg = WeixinMessage(bodyString)
         if wxMsg.MsgType == 'event':
-            sql = '''INSERT INTO `omgm4j`.`m4j_user` (`usr_openid`,`usr_create_time`, `status`) VALUES ('{openID}', CURRENT_TIMESTAMP, '0');'''.format(openID = wxMsg.FromUserName)
-
-            print sql
-            try:
-                self.db.insert(sql)
-            except IntegrityError:
-                pass
-
-            reply = TEXT_REPLY.format(
-                    toUser = wxMsg.FromUserName,
-                    fromUser = wxMsg.ToUserName,
-                    createTime = str(int(time.time())),
-                    content = WELCOME_REPLY
-                    )
-
+            if wxMsg.Event == 'unsubscribe':
+                sql = '''UPDATE  `omgm4j`.`m4j_user` SET  `status` =  '-1' WHERE  `m4j_user`.`usr_openid` ='{openid}';'''.format(openid=wxMsg.FromUserName)
+                print sql
+                self.db.update(sql)
+                reply = ''
+            else:
+                sql = '''INSERT INTO `omgm4j`.`m4j_user` (`usr_openid`,`usr_create_time`,`last_use_time`,`status`,`invite`) VALUES ('{openID}', CURRENT_TIMESTAMP,CURRENT_TIMESTAMP, '0',0);'''.format(openID = wxMsg.FromUserName)
+                print sql
+                try:
+                    self.db.insert(sql)
+                except:
+                    #logging in file
+                    pass
+                reply = TEXT_REPLY.format(
+                        toUser = wxMsg.FromUserName,
+                        fromUser = wxMsg.ToUserName,
+                        createTime = str(int(time.time())),
+                        content = WELCOME_REPLY
+                        )
         elif wxMsg.MsgType == 'text':
             reply = TEXT_REPLY.format(
                     toUser = wxMsg.FromUserName,
