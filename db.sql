@@ -32,10 +32,10 @@ CREATE TABLE m4j_user(
 CREATE TABLE m4j_article(
     arti_id INT(20) NOT NULL AUTO_INCREMENT,
     arti_title VARCHAR(255) NOT NULL,
-    arti_desc VARCHAR(1000) NULL, #need change type attribute
+    arti_desc VARCHAR(1000) NULL,
     arti_pic_url VARCHAR(255) NULL,
     arti_url VARCHAR(255) NULL,
-    arti_category VARCHAR(255) NULL, #add to differentiate job chances & interview experience
+    arti_category VARCHAR(255) NULL,
     PRIMARY KEY (arti_id)
 ) ENGINE=InnoDB;
 
@@ -50,7 +50,7 @@ CREATE TABLE m4j_experience(
     PRIMARY KEY (exper_id)
 ) ENGINE=InnoDB;
 
-
+#Uncreate
 CREATE TABLE m4j_job(
     job_id INT(20) NOT NULL AUTO_INCREMENT,
     job_title VARCHAR(255) NOT NULL,
@@ -79,4 +79,8 @@ CREATE TABLE m4j_company(
 ) ENGINE=InnoDB;
 
 
-
+CREATE TABLE m4j_chapter(
+    chapter_id INT(20) NOT NULL AUTO_INCREMENT,
+    chapter_name VARCHAR(255) NOT NULL UNIQUE,
+    PRIMARY KEY (chapter_name)
+) ENGINE=InnoDB

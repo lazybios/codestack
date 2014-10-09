@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foundation | Welcome</title>
+    <link rel="stylesheet" href="css/foundation.css" />
+    <script src="js/vendor/modernizr.js"></script>
+    <style type="text/css">
+     body{
+        font-family: "Helvetica Neue",Helvetica,"Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+        background-color:rgb(248, 248, 248); 
+      }
+      .main{
+        padding: 20px;
+        background-color: #fff;
+        border-top-width: 0;          
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+        <div class="small-8 large-centered columns main">
+          <form>
+            <fieldset>
+              <legend>添加文章</legend>
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label>标题
+                      <input id="correct_item" name="correct" type="text" placeholder="" />
+                    </label>
+                  </div>
+                </div>
+            
+              <div class="row">
+                <div class="large-12 columns">
+                  <label>作者（选填）
+                    <input id="correct_item" name="correct" type="text" placeholder="" />
+                  </label>
+                  
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="large-12 columns">
+                  <label>封面（大图片建议尺寸：900像素 * 500像素）
+                    <br>
+                    <a role="button" aria-label="submit form" href="#" class="button tiny">上传</a>
+                    <input id="checkbox1" type="checkbox"><label for="checkbox1">封面图片显示在正文中</label>
+                  </label>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="large-12 columns" id="choose_type">
+                  <label>摘要
+                    <textarea name="qz_analysis" placeholder="" rows="5"></textarea>
+                  </label>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="large-12 columns" id="choose_type">
+                  <label>正文
+                    <textarea name="qz_analysis" placeholder="" rows="20"></textarea>
+                  </label>
+                </div>
+              </div>
+
+                <div class="row">
+                  <div class="large-12 columns">
+                    <label>原文链接
+                        <input id="correct_item" name="correct" type="text" placeholder="" />
+                    </label>
+                  </div>
+                </div>      
+                <div class="row"> 
+                  <div class="large-12 columns">         
+                    <a role="button" aria-label="submit form" href="#" class="button">重置</a>
+                    <a role="button" aria-label="submit form" href="#" class="button">保存</a>
+                  </div>
+                </div>
+            </fieldset>
+          </form>
+        </div>
+    </div>
+    <script src="js/vendor/jquery.js"></script>
+    <script src="js/foundation.min.js"></script>    
+    <script>
+      $(document).foundation();
+    </script>
+  </body>
+</html>
